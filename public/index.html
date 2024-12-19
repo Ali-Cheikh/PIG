@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Placeholder Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <!-- <div class="bg-black text-white min-h-screen flex items-center justify-center">
+    <div class="max-w-lg w-full bg-gray-900 rounded-lg shadow-lg p-6 m-5">
+        <h1 class="text-2xl font-bold text-yellow-500 text-center mb-6">Placeholder Image Generator</h1>
+        <form id="placeholderForm" class="space-y-4">
+            <div>
+                <label for="width" class="block text-sm font-medium text-white">Width (px):</label>
+                <input type="number" min="150" id="width" name="width" class="w-full bg-gray-800 text-white border border-gray-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g., 300" required>
+            </div>
+            <div>
+                <label for="height" class="block text-sm font-medium text-white">Height (px):</label>
+                <input type="number" min="150" id="height" name="height" class="w-full bg-gray-800 text-white border border-gray-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g., 200" required>
+            </div>
+            <div>
+                <label for="text" class="block text-sm font-medium text-white">Text (optional):</label>
+                <input type="text" id="text" name="text" class="w-full bg-gray-800 text-white border border-gray-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g., Hello World (max 16 bytes)">
+            </div>
+            <div>
+                <label for="bgColor" class="block text-sm font-medium text-white">Background Color (hex):</label>
+                <div class="flex items-center space-x-2">
+                    <input type="text" id="bgColor" name="bgColor" class="w-4/5 bg-gray-800 text-white border border-gray-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g., 000000">
+                    <input type="color" id="bgColorPicker" style="height: 30px !important;" class="w-1/5 bg-gray-800 border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+            </div>
+            <div>
+                <label for="textColor" class="block text-sm font-medium text-white">Text Color (hex):</label>
+                <div class="flex items-center space-x-2">
+                    <input type="text" id="textColor" name="textColor" class="w-4/5 bg-gray-800 text-white border border-gray-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="e.g., FFFFFF">
+                    <input type="color" id="textColorPicker" style="height: 30px !important;" class="w-1/5 bg-gray-800 border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+            </div>
+            <button type="submit"
+                class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-red-500">Generate
+                Placeholder</button>
+        </form>
+
+        <div id="result" class="mt-6 text-center hidden">
+            <p class="text-white">Generated Placeholder:</p>
+            <a id="placeholderLink" href="#" target="_blank" class="text-purple-400 underline"></a>
+            <center>
+                <img id="placeholderImage" src="#" alt="Generated Placeholder" class="item-center mt-4 rounded border border-gray-700 hidden">
+            </center>
+        </div>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('placeholderForm');
+    const resultDiv = document.getElementById('result');
+    const placeholderLink = document.getElementById('placeholderLink');
+    const placeholderImage = document.getElementById('placeholderImage');
+    const bgColorInput = document.getElementById('bgColor');
+    const bgColorPicker = document.getElementById('bgColorPicker');
+    const textColorInput = document.getElementById('textColor');
+    const textColorPicker = document.getElementById('textColorPicker');
+
+    // Add your forbidden words here
+    const forbiddenWords = [
+        "fuck", "shit", "bitch", "asshole", "dick", "pussy", "cunt", "bastard", "slut", "whore",
+        "motherfucker", "cock", "faggot", "prick", "twat", "douchebag", "dipshit", "dickhead",
+        "wanker", "bollocks", "arsehole", "tits", "nigger", "chink", "spic", "kike", "raghead", 
+        "gook", "camel jockey", "gypsy", "redneck", "hillbilly", "cracker", "slutty", "skank", 
+        "fucker", "bimbo", "retard", "mongoloid", "idiot", "moron", "loser", "fucktard", "screwdriver",
+        "dingleberry", "butthole", "cum", "jizz", "semen", "testicle", "vagina", "penis", "ejaculate",
+        "rape", "molest", "incest", "bestiality", "necrophilia", "pedophile", "childporn", "fisting",
+        "assrape", "fuckface", "shithead", "cockhead", "cumdumpster", "ballbag", "spunk", "coochie",
+        "clit", "cumshot", "cocksucker", "dicklicker", "buttfuck", "gash", "snatch", "bootyhole", 
+        "fuckstick", "cummy", "bukkake", "queer", "homo", "lesbo", "tranny", "hermaphrodite"
+    ];
+
+    // Sync color picker and text input
+    bgColorPicker.addEventListener('input', (e) => {
+        bgColorInput.value = e.target.value.substring(1); // Remove # from hex code
+    });
+
+    textColorPicker.addEventListener('input', (e) => {
+        textColorInput.value = e.target.value.substring(1); // Remove # from hex code
+    });
+
+    bgColorInput.addEventListener('input', (e) => {
+        if (/^[0-9A-Fa-f]{6}$/.test(e.target.value)) { // Check for valid hex code
+            bgColorPicker.value = `#${e.target.value}`;
+        }
+    });
+
+    textColorInput.addEventListener('input', (e) => {
+        if (/^[0-9A-Fa-f]{6}$/.test(e.target.value)){
+            textColorPicker.value = `#${e.target.value}`;
+        }
+    });
+
+    function validateInput() {
+        const text = document.getElementById('text').value;
+
+        // Check for forbidden words
+        for (let word of forbiddenWords) {
+            if (text.toLowerCase().includes(word)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Text',
+                    text: 'Your input contains forbidden words!',
+                });
+                return false;
+            }
+        }
+
+        // Check for more than 3 separate letters or spaces
+        const letterGroups = text.split(/[\s]+/).filter(group => group.length > 3);
+        if (letterGroups.length > 3) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Too many words',
+                text: 'You cannot have more than 3 separate groups of 3+ letters!',
+            });
+            return false;
+        }
+
+        return true;
+    }
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        if (!validateInput()) {
+            return;
+        }
+
+        const width = document.getElementById('width').value;
+        const height = document.getElementById('height').value;
+        const text = encodeURIComponent(document.getElementById('text').value);
+        const bg = bgColorInput.value || '000000';
+        const texts = textColorInput.value || 'FFFFFF';
+        const bgColor = bg.toUpperCase();
+        const textColor = texts.toUpperCase();
+
+        let url = `https://via.placeholder.com/${width}x${height}/${bgColor}/${textColor}`;
+        if (text) {
+            url += `?text=${text}`;
+        }
+
+        // Show loading indicator using SweetAlert
+        Swal.fire({
+            title: 'Generating...',
+            text: 'Please wait while we generate the placeholder image.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            background : ' rgb(17 24 39)',
+            color :'rgb(202 138 4 )'
+        });
+
+        // Create an Image Object to check when it loads
+        const img = new Image();
+        img.src = url;
+
+        img.onload = () => {
+            // Once the image is loaded, show the result
+            placeholderLink.href = url;
+            placeholderLink.textContent = url;
+            placeholderImage.src = url;
+            placeholderImage.classList.remove('hidden');
+            resultDiv.classList.remove('hidden');
+
+            // Close the SweetAlert loading indicator
+            Swal.close();
+        };
+
+        img.onerror = () => {
+            // If there is an error loading the image
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'There was an error generating the image.',
+            });
+            placeholderLink.href = url;
+            placeholderLink.textContent = url;
+            resultDiv.classList.remove('hidden');
+        };
+    });
+</script> -->
+</body>
+
+</html>
