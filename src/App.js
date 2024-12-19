@@ -198,7 +198,6 @@ function App() {
             Generate Placeholder
           </button>
         </form>
-
         {imageLoaded && (
           <div id="result" className="mt-6 text-center">
             <p className="text-white">Generated Placeholder:</p>
@@ -216,5 +215,4 @@ function App() {
     </div>
   );
 }
-
 export default App;
