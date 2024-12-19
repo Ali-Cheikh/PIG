@@ -3,7 +3,16 @@ import Swal from "sweetalert2";
 import "./App.css"; // Ensure your TailwindCSS is properly imported
 
 const forbiddenWords = [
-  // List of forbidden words (same as your original list)
+  "fuck", "shit", "bitch", "asshole", "dick", "pussy", "cunt", "bastard", "slut", "whore",
+  "motherfucker", "cock", "faggot", "prick", "twat", "douchebag", "dipshit", "dickhead",
+  "wanker", "bollocks", "arsehole", "tits", "nigger", "chink", "spic", "kike", "raghead", 
+  "gook", "camel jockey", "gypsy", "redneck", "hillbilly", "cracker", "slutty", "skank", 
+  "fucker", "bimbo", "retard", "mongoloid", "idiot", "moron", "loser", "fucktard", "screwdriver",
+  "dingleberry", "butthole", "cum", "jizz", "semen", "testicle", "vagina", "penis", "ejaculate",
+  "rape", "molest", "incest", "bestiality", "necrophilia", "pedophile", "childporn", "fisting",
+  "assrape", "fuckface", "shithead", "cockhead", "cumdumpster", "ballbag", "spunk", "coochie",
+  "clit", "cumshot", "cocksucker", "dicklicker", "buttfuck", "gash", "snatch", "bootyhole", 
+  "fuckstick", "cummy", "bukkake", "queer", "homo", "lesbo", "tranny", "hermaphrodite"
 ];
 
 function App() {
@@ -15,6 +24,7 @@ function App() {
   const [resultUrl, setResultUrl] = useState("");
   const [imageLoaded, setImageLoaded] = useState(false);
 
+
   const validateInput = () => {
     // Check for forbidden words
     for (let word of forbiddenWords) {
@@ -23,8 +33,8 @@ function App() {
           icon: "error",
           title: "Invalid Text",
           text: "Your input contains forbidden words!",
-          background: "red",
-          color: "rgb(202 138 4)",
+          background: "rgb(207 40 39)",
+          color: "rgb(10 380 400)",
         });
         return false;
       }
@@ -37,8 +47,6 @@ function App() {
         icon: "error",
         title: "Too many words",
         text: "You cannot have more than 3 separate groups of 3+ letters!",
-        background: "rgb(17 24 39)",
-        color: "rgb(202 138 4)",
       });
       return false;
     }
@@ -71,18 +79,19 @@ function App() {
     img.src = url;
 
     img.onload = () => {
-      setImageLoaded(true);
       setResultUrl(url);
+      setImageLoaded(true);
       Swal.close();
     };
 
     img.onerror = () => {
+      setResultUrl(url);
       Swal.fire({
-        icon: "info",
+        icon: "error",
         title: "Error",
-        text: "Click again and if this popup comes again change something",
-        background: "blue",
-        color: "rgb(302 8 4)",
+        text: "There was an error generating the image. Try regenerating",
+        background: "rgb(170 24 39)",
+        color: "rgb(1 8000 4)",
       });
     };
   };
