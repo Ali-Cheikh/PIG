@@ -4,7 +4,8 @@
 
 ## Overview
 The Placeholder Image Generator is a web application built with React that allows users to create placeholder images with customizable dimensions, text, background color, and text color. It also validates the input text to ensure no offensive language is included and adheres to specific text formatting rules. The application uses the **Via.placeholder.com** API for image generation.
-
+![alt text](img.png) 
+### [ Link](https://ali-cheikh.github.io/PIG/)
 ### Features
 - Generate placeholder images with specified width and height.
 - Customizable background and text colors (supports hex codes).
@@ -73,14 +74,11 @@ To run this application, you need the following:
 - **Via.placeholder.com API** for image generation.
 
 
-## License
-This project is open source and available under the [MIT License](LICENSE).
-
 ## Contributions
 Contributions are welcome! Feel free to fork the repository and submit pull requests.
 
 ## Contact
-For any questions or feedback, please contact [Ali Cheikh](mailto:ali@example.com).
+For any questions or feedback, please contact [Ali Cheikh](mailto:contact@ali-cheikh.com).
 
 ---
 
@@ -108,3 +106,4 @@ Let me know if you'd like to add or change anything!
 ├── README.md              # Documentation
 ├── package.json           # Project metadata and dependencies
 ```
+@Ali-Cheikh
