@@ -1,6 +1,4 @@
-Here's the updated README file structure and technologies section reflecting the use of React and Node.js with Express. Let me know if there's anything else you'd like to refine:
 
----
 
 # Placeholder Image Generator
 
