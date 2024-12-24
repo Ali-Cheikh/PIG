@@ -8,7 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-  <div id="root"></div>
   <div class="bg-black text-white min-h-screen flex items-center justify-center">
     <div class="max-w-lg w-full bg-gray-900 rounded-lg shadow-lg p-6 m-5">
         <h1 class="text-2xl font-bold text-yellow-500 text-center mb-6">Placeholder Image Generator</h1>
@@ -55,6 +54,7 @@
 </div>
 
 <script>
+    // Get DOM elements
     const form = document.getElementById('placeholderForm');
     const resultDiv = document.getElementById('result');
     const placeholderLink = document.getElementById('placeholderLink');
@@ -64,129 +64,179 @@
     const textColorInput = document.getElementById('textColor');
     const textColorPicker = document.getElementById('textColorPicker');
 
-    // Add your forbidden words here
-    const forbiddenWords = [
-        "fuck", "shit", "bitch", "asshole", "dick", "pussy", "cunt", "bastard", "slut", "whore",
-        "motherfucker", "cock", "faggot", "prick", "twat", "douchebag", "dipshit", "dickhead",
-        "wanker", "bollocks", "arsehole", "tits", "nigger", "chink", "spic", "kike", "raghead", 
-        "gook", "camel jockey", "gypsy", "redneck", "hillbilly", "cracker", "slutty", "skank", 
-        "fucker", "bimbo", "retard", "mongoloid", "idiot", "moron", "loser", "fucktard", "screwdriver",
-        "dingleberry", "butthole", "cum", "jizz", "semen", "testicle", "vagina", "penis", "ejaculate",
-        "rape", "molest", "incest", "bestiality", "necrophilia", "pedophile", "childporn", "fisting",
-        "assrape", "fuckface", "shithead", "cockhead", "cumdumpster", "ballbag", "spunk", "coochie",
-        "clit", "cumshot", "cocksucker", "dicklicker", "buttfuck", "gash", "snatch", "bootyhole", 
-        "fuckstick", "cummy", "bukkake", "queer", "homo", "lesbo", "tranny", "hermaphrodite"
-    ];
+    // Set default colors
+    bgColorInput.value = '000000';
+    textColorInput.value = 'FFFFFF';
+    bgColorPicker.value = '#000000';
+    textColorPicker.value = '#FFFFFF';
 
-    // Sync color picker and text input
+    // Validate hex color
+    function isValidHex(hex) {
+        return /^[0-9A-Fa-f]{6}$/.test(hex);
+    }
+
     bgColorPicker.addEventListener('input', (e) => {
-        bgColorInput.value = e.target.value.substring(1); // Remove # from hex code
-    });
-
-    textColorPicker.addEventListener('input', (e) => {
-        textColorInput.value = e.target.value.substring(1); // Remove # from hex code
+        bgColorInput.value = e.target.value.substring(1);
     });
 
     bgColorInput.addEventListener('input', (e) => {
-        if (/^[0-9A-Fa-f]{6}$/.test(e.target.value)) { // Check for valid hex code
-            bgColorPicker.value = `#${e.target.value}`;
+        const hex = e.target.value;
+        if (isValidHex(hex)) {
+            bgColorPicker.value = '#' + hex;
+            bgColorInput.classList.remove('border-red-500');
+        } else {
+            bgColorInput.classList.add('border-red-500');
         }
+    });
+
+    textColorPicker.addEventListener('input', (e) => {
+        textColorInput.value = e.target.value.substring(1);
     });
 
     textColorInput.addEventListener('input', (e) => {
-        if (/^[0-9A-Fa-f]{6}$/.test(e.target.value)){
-            textColorPicker.value = `#${e.target.value}`;
+        const hex = e.target.value;
+        if (isValidHex(hex)) {
+            textColorPicker.value = '#' + hex;
+            textColorInput.classList.remove('border-red-500');
+        } else {
+            textColorInput.classList.add('border-red-500');
         }
     });
 
-    function validateInput() {
-        const text = document.getElementById('text').value;
-
-        // Check for forbidden words
-        for (let word of forbiddenWords) {
-            if (text.toLowerCase().includes(word)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Text',
-                    text: 'Your input contains forbidden words!',
-                });
-                return false;
-            }
+    // Form submission
+    function validateSize(value, field) {
+        const size = parseInt(value);
+        if (size < 150 || size > 3000) {
+            document.getElementById(field).classList.add('border-red-500');
+            throw new Error(`${field} must be between 150 and 3000 pixels`);
         }
-
-        // Check for more than 3 separate letters or spaces
-        const letterGroups = text.split(/[\s]+/).filter(group => group.length > 3);
-        if (letterGroups.length > 3) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Too many words',
-                text: 'You cannot have more than 3 separate groups of 3+ letters!',
-            });
-            return false;
-        }
-
-        return true;
+        document.getElementById(field).classList.remove('border-red-500');
+        return size;
     }
 
-    form.addEventListener('submit', (e) => {
+    // Replace form submission with enhanced validation
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        if (!validateInput()) {
-            return;
-        }
+        try {
+            // Validate sizes
+            const width = validateSize(document.getElementById('width').value, 'width');
+            const height = validateSize(document.getElementById('height').value, 'height');
+            
+            // Validate colors
+            if (!isValidHex(bgColorInput.value)) {
+                throw new Error('Invalid background color hex code');
+            }
+            if (!isValidHex(textColorInput.value)) {
+                throw new Error('Invalid text color hex code');
+            }
 
-        const width = document.getElementById('width').value;
-        const height = document.getElementById('height').value;
-        const text = encodeURIComponent(document.getElementById('text').value);
-        const bg = bgColorInput.value || '000000';
-        const texts = textColorInput.value || 'FFFFFF';
-        const bgColor = bg.toUpperCase();
-        const textColor = texts.toUpperCase();
+            const text = document.getElementById('text').value;
+            const bgColor = bgColorInput.value.toUpperCase();
+            const textColor = textColorInput.value.toUpperCase();
 
-        let url = `https://via.placeholder.com/${width}x${height}/${bgColor}/${textColor}`;
-        if (text) {
-            url += `?text=${text}`;
-        }
+            // Validate text length
+            if (text && new TextEncoder().encode(text).length > 16) {
+                throw new Error('Text exceeds 16 bytes limit');
+            }
 
-        // Show loading indicator using SweetAlert
-        Swal.fire({
-            title: 'Generating...',
-            text: 'Please wait while we generate the placeholder image.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            },
-            background : ' rgb(17 24 39)',
-            color :'rgb(202 138 4 )'
-        });
+            // Generate URL with validation
+            const url = new URL(`https://via.placeholder.com/${width}x${height}/${bgColor}/${textColor}`);
+            if (text) url.searchParams.set('text', text);
 
-        // Create an Image Object to check when it loads
-        const img = new Image();
-        img.src = url;
+            // Add loading timeout
+            const loadingTimeout = setTimeout(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Timeout',
+                    text: 'Image generation took too long. Please try again.',
+                    background: 'rgb(17 24 39)',
+                    color: 'rgb(202 138 4)'
+                });
+            }, 10000);
 
-        img.onload = () => {
-            // Once the image is loaded, show the result
-            placeholderLink.href = url;
-            placeholderLink.textContent = url;
-            placeholderImage.src = url;
-            placeholderImage.classList.remove('hidden');
-            resultDiv.classList.remove('hidden');
+            // Show loading
+            Swal.fire({
+                title: 'Generating...',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                background: 'rgb(17 24 39)',
+                color: 'rgb(202 138 4)',
+                didOpen: () => Swal.showLoading()
+            });
 
-            // Close the SweetAlert loading indicator
-            Swal.close();
-        };
+            // Load image with timeout clear
+            const img = new Image();
+            img.src = url.toString();
+            
+            img.onload = () => {
+                clearTimeout(loadingTimeout);
+                placeholderLink.href = url.toString();
+                placeholderLink.textContent = url.toString();
+                placeholderImage.src = url.toString();
+                placeholderImage.classList.remove('hidden');
+                resultDiv.classList.remove('hidden');
+                Swal.close();
+                
+                // Add success notification
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Image Generated!',
+                    text: 'Click the link to copy URL',
+                    timer: 2000,
+                    background: 'rgb(17 24 39)',
+                    color: 'rgb(202 138 4)',
+                    showConfirmButton: false
+                });
+            };
 
-        img.onerror = () => {
-            // If there is an error loading the image
+            img.onerror = () => {
+                clearTimeout(loadingTimeout);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to generate image. Please verify your inputs and try again.',
+                    background: 'rgb(17 24 39)',
+                    color: 'rgb(202 138 4)',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Retry',
+                    showCancelButton: true,
+                    cancelButtonText: 'Close'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.dispatchEvent(new Event('submit'));
+                    }
+                });
+                resultDiv.classList.add('hidden');
+            };
+
+            // Add click-to-copy functionality
+            placeholderLink.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await navigator.clipboard.writeText(url.toString());
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'URL Copied!',
+                        timer: 1500,
+                        background: 'rgb(17 24 39)',
+                        color: 'rgb(202 138 4)',
+                        showConfirmButton: false
+                    });
+                } catch (err) {
+                    console.error('Failed to copy URL:', err);
+                }
+            });
+
+        } catch (error) {
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: 'There was an error generating the image.',
+                title: 'Validation Error',
+                text: error.message,
+                background: 'rgb(17 24 39)',
+                color: 'rgb(202 138 4)'
             });
-            placeholderLink.href = url;
-            placeholderLink.textContent = url;
-            resultDiv.classList.remove('hidden');
-        };
+        }
     });
 </script>
 </body>
